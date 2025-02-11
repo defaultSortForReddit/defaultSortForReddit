@@ -1,3 +1,6 @@
+// Author: James Wiesen
+// Copyright © 2025 defaultSortForReddit. All rights reserved.
+
 // Save options to browser.storage
 function saveOptions() {
   const sortOption = document.getElementById("sortOption").value;

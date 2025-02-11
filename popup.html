@@ -1,6 +1,10 @@
+<!-- Author: James Wiesen -->
+<!-- Copyright © 2025 defaultSortForReddit. All rights reserved. -->
+
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>defaultSortForReddit Options</title>
     <style>
         body {
@@ -9,10 +13,20 @@
             background-color: #f0f8ff; /* Light blue background to match the icon theme */
             color: #333; /* Dark text for contrast */
         }
+        h1 {
+            font-size: 32px;
+            margin-bottom: 5px;
+            color: #00C0F1; /* Orange color for headings to match the arrow */
+        }
         h2 {
             font-size: 16px;
             margin-bottom: 5px;
             color: #ff4500; /* Orange color for headings to match the arrow */
+        }
+        h3 {
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #00C0F1; /* Orange color for headings to match the arrow */
         }
         label, select, input, button {
             display: block;
@@ -49,6 +63,7 @@
     </style>
 </head>
 <body>
+    <h1>defaultSortForReddit Options</h1>
     <h2>Home Page Sort Option</h2>
     <label for="sortOption">Choose your default sort option for the home page:</label>
     <select id="sortOption" default="new">
@@ -84,6 +99,8 @@
 
     <h2>Per-Subreddit Preferences</h2>
     <div id="subredditPreferencesList"></div>
+    
+    <h3>Authored by James Wiesen - Copyright © 2025 defaultSortForReddit. All rights reserved.</h3>
 
     <script src="popup.js"></script>
 </body>

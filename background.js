@@ -1,3 +1,6 @@
+// Author: James Wiesen
+// Copyright © 2025 defaultSortForReddit. All rights reserved.
+
 console.log('Background script running');
 
 function redirect(requestDetails) {

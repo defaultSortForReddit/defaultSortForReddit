@@ -16,3 +16,11 @@ Main Screen:
 Minimal Permissions Required:
 
 ![Alt text](images/Permissions.png?raw=true "Permissions")
+
+**Author**
+
+James Wiesen
+
+**Copyright**
+
+© 2025 defaultSortForReddit. All rights reserved.
