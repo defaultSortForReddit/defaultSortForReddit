@@ -6,11 +6,13 @@ function saveOptions() {
   const sortOption = document.getElementById("sortOption").value;
   const sortOptionSubreddit = document.getElementById("sortOptionSubreddit").value;
   const subredditSortOptions = JSON.parse(localStorage.getItem("subredditSortOptions")) || {};
+  const darkMode = document.getElementById("darkModeToggle").checked;
 
   browser.storage.local.set({
       sortOption: sortOption,
       sortOptionSubreddit: sortOptionSubreddit,
-      subredditSortOptions: subredditSortOptions
+      subredditSortOptions: subredditSortOptions,
+      darkMode: darkMode
   }).then(() => {
       const saveBtn = document.getElementById("saveBtn");
       saveBtn.disabled = true;
@@ -28,12 +30,16 @@ function restoreOptions() {
       const sortOption = result.sortOption || "new";
       const sortOptionSubreddit = result.sortOptionSubreddit || "new";
       const subredditSortOptions = result.subredditSortOptions || {};
+      const darkMode = result.darkMode || false;
 
       document.getElementById("sortOption").value = sortOption;
       document.getElementById("sortOptionSubreddit").value = sortOptionSubreddit;
       
       localStorage.setItem("subredditSortOptions", JSON.stringify(subredditSortOptions));
       updateSubredditPreferencesList(subredditSortOptions);
+
+      document.getElementById("darkModeToggle").checked = darkMode;
+      applyDarkMode(darkMode);
 
       document.getElementById("saveBtn").disabled = true;
   }
@@ -42,15 +48,33 @@ function restoreOptions() {
       console.error(`Error: ${error}`);
   }
 
-  const getting = browser.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions"]);
+  const getting = browser.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "darkMode"]);
   getting.then(setCurrentChoice, onError);
 }
 
+// Apply Dark Mode based on the user's preference
+function applyDarkMode(isDarkMode) {
+  const darkModeLabel = document.querySelector(".dark-mode-label");
+  if (isDarkMode) {
+      document.body.classList.add("dark-mode");
+      darkModeLabel.textContent = "Dark Mode";
+  } else {
+      document.body.classList.remove("dark-mode");
+      darkModeLabel.textContent = "Dark Mode";
+  }
+}
+
 // Enable Save button when preferences are changed
-function handlePreferenceChange() {
+function handlePreferenceChange(event) {
   const saveBtn = document.getElementById("saveBtn");
   saveBtn.disabled = false;
   saveBtn.style.backgroundColor = ""; // Reset to default button color
+
+  if (event.target.id === "darkModeToggle") {
+      const isDarkMode = event.target.checked;
+      applyDarkMode(isDarkMode);
+      browser.storage.local.set({ darkMode: isDarkMode }); // Save Dark Mode preference
+  }
 }
 
 // Add subreddit preference
@@ -139,6 +163,10 @@ document.addEventListener("DOMContentLoaded", () => {
   restoreOptions();
   checkIfSaveNeeded();
   checkAddSubredditPreference();
+  document.getElementById("darkModeToggle").addEventListener("change", handlePreferenceChange);
+  document.getElementById("darkModeToggle").addEventListener("change", (event) => {
+    applyDarkMode(event.target.checked);
+  });
 });
 document.getElementById("saveBtn").addEventListener("click", saveOptions);
 document.getElementById("sortOption").addEventListener("change", handlePreferenceChange);

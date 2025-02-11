@@ -16,7 +16,7 @@
         h1 {
             font-size: 32px;
             margin-bottom: 5px;
-            color: #00C0F1; /* Orange color for headings to match the arrow */
+            color: #00C0F1; /* Blue color for headings to match the arrow */
         }
         h2 {
             font-size: 16px;
@@ -26,7 +26,7 @@
         h3 {
             font-size: 12px;
             margin-bottom: 5px;
-            color: #00C0F1; /* Orange color for headings to match the arrow */
+            color: #00C0F1; /* Blue color for headings to match the arrow */
         }
         label, select, input, button {
             display: block;
@@ -60,10 +60,75 @@
         .subreddit-preference button {
             margin-left: 10px;
         }
+        .dark-mode {
+            background-color: #1e1e1e; /* Softer dark background */
+            color: #cfcfcf; /* Softer light text */
+        }
+        .dark-mode button {
+            background-color: #444444; /* Softer button background */
+            color: #cfcfcf; /* Softer button text */
+        }
+        .dark-mode button:hover:enabled {
+            background-color: #555555; /* Slightly darker button on hover */
+        }
+        .dark-mode-toggle {
+            position: relative;
+            left: 335px;
+            top: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .slider {
+            position: relative;
+            width: 34px;
+            height: 14px;
+            background-color: #ccc;
+            border-radius: 34px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .slider:before {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            top: -3px;
+            left: -3px;
+            transition: transform 0.2s;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+        .dark-mode-label {
+            margin-left: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+        .dark-mode .dark-mode-label {
+            color: #cfcfcf; /* Softer label text */
+        }
+        .dark-mode h1 {
+            color: #66b2ff; /* Softer blue for h1 */
+        }
+        .dark-mode h2 {
+            color: #ff704d; /* Softer orange for h2 */
+        }
+        .dark-mode h3 {
+            color: #66b2ff; /* Softer blue for h3 */
+        }
     </style>
 </head>
 <body>
-    <h1>defaultSortForReddit Options</h1>
+    <h1>defaultSortForReddit Options     <label class="dark-mode-toggle">
+        <input type="checkbox" id="darkModeToggle" style="display:none;">
+        <span class="slider"></span>
+        <span class="dark-mode-label">Dark Mode</span>
+    </label> </h1>
     <h2>Home Page Sort Option</h2>
     <label for="sortOption">Choose your default sort option for the home page:</label>
     <select id="sortOption" default="new">
