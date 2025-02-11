@@ -1,45 +1,90 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>defaultSortForReddit Options</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 10px;
-    }
-    h2 {
-      font-size: 16px;
-      margin-bottom: 5px;
-    }
-    label, select, button {
-      display: block;
-      margin-bottom: 10px;
-    }
-  </style>
+    <title>defaultSortForReddit Options</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 10px;
+            background-color: #f0f8ff; /* Light blue background to match the icon theme */
+            color: #333; /* Dark text for contrast */
+        }
+        h2 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #ff4500; /* Orange color for headings to match the arrow */
+        }
+        label, select, input, button {
+            display: block;
+            margin-bottom: 10px;
+        }
+        select, input, button {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #ff4500; /* Orange button background */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: gray; /* Gray background when disabled */
+            cursor: not-allowed;
+        }
+        button:hover:enabled {
+            background-color: #e03e00; /* Darker orange on hover */
+        }
+        .subreddit-preference {
+            display: flex;
+            align-items: center;
+        }
+        .subreddit-preference div {
+            flex-grow: 1;
+        }
+        .subreddit-preference button {
+            margin-left: 10px;
+        }
+    </style>
 </head>
 <body>
-  <h2>Home Page Sort Option</h2>
-  <label for="sortOption">Choose your default sort option for the home page:</label>
-  <select id="sortOption">
-    <option value="best">Best</option>
-    <option value="hot">Hot</option>
-    <option value="top">Top</option>
-    <option value="new">New</option>
-    <option value="rising">Rising</option>
-  </select>
-  
-  <h2>Subreddit Sort Option</h2>
-  <label for="sortOptionSubreddit">Choose your default sort option for subreddits:</label>
-  <select id="sortOptionSubreddit">
-    <option value="best">Best</option>
-    <option value="hot">Hot</option>
-    <option value="top">Top</option>
-    <option value="new">New</option>
-    <option value="rising">Rising</option>
-  </select>
-  
-  <button id="saveBtn">Save</button>
+    <h2>Home Page Sort Option</h2>
+    <label for="sortOption">Choose your default sort option for the home page:</label>
+    <select id="sortOption" default="new">
+        <option value="new" selected>New</option>
+        <option value="best">Best</option>
+        <option value="hot">Hot</option>
+        <option value="top">Top</option>
+        <option value="rising">Rising</option>
+    </select>
 
-  <script src="popup.js"></script>
+    <h2>Subreddit Sort Option</h2>
+    <label for="sortOptionSubreddit">Choose your default sort option for subreddits:</label>
+    <select id="sortOptionSubreddit" default="new">
+        <option value="new" selected>New</option>
+        <option value="hot">Hot</option>
+        <option value="top">Top</option>
+        <option value="rising">Rising</option>
+    </select>
+
+    <button id="saveBtn" disabled>Save Default Sort Options</button>
+
+    <h2>Per-Subreddit Sort Option</h2>
+    <label for="subredditName">Subreddit:</label>
+    <input type="text" id="subredditName" placeholder="e.g., funny">
+    <label for="subredditSortOption">Sort option for this subreddit:</label>
+    <select id="subredditSortOption">
+        <option value="new" selected>New</option>
+        <option value="hot">Hot</option>
+        <option value="top">Top</option>
+        <option value="rising">Rising</option>
+    </select>
+    <button id="addSubredditBtn" disabled>Add Subreddit Preference</button>
+
+    <h2>Per-Subreddit Preferences</h2>
+    <div id="subredditPreferencesList"></div>
+
+    <script src="popup.js"></script>
 </body>
 </html>
