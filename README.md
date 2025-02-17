@@ -13,6 +13,11 @@ Main Screen:
 
 ![Alt text](images/MainScreen.png?raw=true "MainScreen")
 
+Main Screen (Dark Mode): 
+
+![Alt text](images/MainScreenDarkMode.png?raw=true "MainScreenDarkMode")
+
+
 Minimal Permissions Required:
 
 ![Alt text](images/Permissions.png?raw=true "Permissions")
