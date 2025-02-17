@@ -7,11 +7,22 @@ function redirect(requestDetails) {
   console.log('Redirect function called');
   console.log('Request URL:', requestDetails.url);
 
+  // Do not redirect message URLs
+  if (requestDetails.url.startsWith("https://www.reddit.com/message")) {
+    console.log('No redirect for message URLs.');
+    return {};
+  }
+
   return browser.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions"])
     .then(result => {
       const sortOption = result.sortOption || "new"; // Home page sort option
       const sortOptionSubreddit = result.sortOptionSubreddit || "new"; // Global subreddit sort option
-      const subredditSortOptions = result.subredditSortOptions || {}; // Specific subreddit sort options
+      let subredditSortOptions = result.subredditSortOptions || {}; // Specific subreddit sort options
+
+      // Sort subredditSortOptions by subreddit name (key)
+      subredditSortOptions = Object.fromEntries(
+        Object.entries(subredditSortOptions).sort(([a], [b]) => a.localeCompare(b))
+      );
 
       const homeUrls = [
         "https://www.reddit.com/",

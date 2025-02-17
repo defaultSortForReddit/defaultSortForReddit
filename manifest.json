@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "defaultSortForReddit",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "This add-on will allow users to select which option they want to use when going to Reddit's home page. By default, it will sort to the \"new\" option.",
   "permissions": [
     "storage",
@@ -28,5 +28,5 @@
   "icons": {
     "48": "icons/icon.png"
   },
-  "author": "James Wiesen - Copyright 2025 defaultSortForReddit. All rights reserved."
+  "author": "Copyright 2025 defaultSortForReddit. All rights reserved."
 }

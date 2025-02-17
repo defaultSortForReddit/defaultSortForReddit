@@ -5,7 +5,10 @@
 function saveOptions() {
   const sortOption = document.getElementById("sortOption").value;
   const sortOptionSubreddit = document.getElementById("sortOptionSubreddit").value;
-  const subredditSortOptions = JSON.parse(localStorage.getItem("subredditSortOptions")) || {};
+  const subredditSortOptions = Object.keys(JSON.parse(localStorage.getItem("subredditSortOptions")) || {}).sort().reduce((acc, key) => {
+      acc[key] = JSON.parse(localStorage.getItem("subredditSortOptions"))[key];
+      return acc;
+  }, {});
   const darkMode = document.getElementById("darkModeToggle").checked;
 
   browser.storage.local.set({
@@ -35,7 +38,11 @@ function restoreOptions() {
       document.getElementById("sortOption").value = sortOption;
       document.getElementById("sortOptionSubreddit").value = sortOptionSubreddit;
       
-      localStorage.setItem("subredditSortOptions", JSON.stringify(subredditSortOptions));
+      const sortedSubredditSortOptions = Object.keys(subredditSortOptions).sort().reduce((acc, key) => {
+          acc[key] = subredditSortOptions[key];
+          return acc;
+      }, {});
+      localStorage.setItem("subredditSortOptions", JSON.stringify(sortedSubredditSortOptions));
       updateSubredditPreferencesList(subredditSortOptions);
 
       document.getElementById("darkModeToggle").checked = darkMode;
@@ -111,7 +118,9 @@ function updateSubredditPreferencesList(subredditSortOptions) {
   const listContainer = document.getElementById("subredditPreferencesList");
   listContainer.innerHTML = "";
 
-  Object.keys(subredditSortOptions).forEach(subredditName => {
+  const sortedSubredditNames = Object.keys(subredditSortOptions).sort();
+
+  sortedSubredditNames.forEach(subredditName => {
       const listItem = document.createElement("div");
       listItem.className = "subreddit-preference";
       
