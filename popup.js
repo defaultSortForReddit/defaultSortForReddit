@@ -5,6 +5,7 @@
 function saveOptions() {
   const sortOption = document.getElementById("sortOption").value;
   const sortOptionSubreddit = document.getElementById("sortOptionSubreddit").value;
+  const sortOptionUser = document.getElementById("sortOptionUser").value;
   const subredditSortOptions = Object.keys(JSON.parse(localStorage.getItem("subredditSortOptions")) || {}).sort().reduce((acc, key) => {
       acc[key] = JSON.parse(localStorage.getItem("subredditSortOptions"))[key];
       return acc;
@@ -14,6 +15,7 @@ function saveOptions() {
   browser.storage.local.set({
       sortOption: sortOption,
       sortOptionSubreddit: sortOptionSubreddit,
+      sortOptionUser: sortOptionUser,
       subredditSortOptions: subredditSortOptions,
       darkMode: darkMode
   }).then(() => {
@@ -32,11 +34,13 @@ function restoreOptions() {
   function setCurrentChoice(result) {
       const sortOption = result.sortOption || "new";
       const sortOptionSubreddit = result.sortOptionSubreddit || "new";
+      const sortOptionUser = result.sortOptionUser || "new";
       const subredditSortOptions = result.subredditSortOptions || {};
       const darkMode = result.darkMode || false;
 
       document.getElementById("sortOption").value = sortOption;
       document.getElementById("sortOptionSubreddit").value = sortOptionSubreddit;
+      document.getElementById("sortOptionUser").value = sortOptionUser;
       
       const sortedSubredditSortOptions = Object.keys(subredditSortOptions).sort().reduce((acc, key) => {
           acc[key] = subredditSortOptions[key];
@@ -55,7 +59,7 @@ function restoreOptions() {
       console.error(`Error: ${error}`);
   }
 
-  const getting = browser.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "darkMode"]);
+  const getting = browser.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "darkMode", "sortOptionUser"]);
   getting.then(setCurrentChoice, onError);
 }
 
@@ -180,6 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
 document.getElementById("saveBtn").addEventListener("click", saveOptions);
 document.getElementById("sortOption").addEventListener("change", handlePreferenceChange);
 document.getElementById("sortOptionSubreddit").addEventListener("change", handlePreferenceChange);
+document.getElementById("sortOptionUser").addEventListener("change", handlePreferenceChange);
 document.getElementById("addSubredditBtn").addEventListener("click", addSubredditPreference);
 document.getElementById("subredditName").addEventListener("input", checkAddSubredditPreference);
 document.getElementById("subredditSortOption").addEventListener("change", checkAddSubredditPreference);

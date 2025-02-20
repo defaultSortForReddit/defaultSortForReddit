@@ -13,11 +13,12 @@ function redirect(requestDetails) {
     return {};
   }
 
-  return browser.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions"])
+  return browser.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "sortOptionUser"])
     .then(result => {
       const sortOption = result.sortOption || "new"; // Home page sort option
       const sortOptionSubreddit = result.sortOptionSubreddit || "new"; // Global subreddit sort option
       let subredditSortOptions = result.subredditSortOptions || {}; // Specific subreddit sort options
+      const sortOptionUser = result.sortOptionUser || "new"; // Global user sort option
 
       // Sort subredditSortOptions by subreddit name (key)
       subredditSortOptions = Object.fromEntries(
@@ -35,10 +36,12 @@ function redirect(requestDetails) {
       ];
 
       const subredditPattern = /https:\/\/www\.reddit\.com\/r\/([^/]+)(\/)?(\?.*)?$/;
+      const userPattern = /https:\/\/www\.reddit\.com\/user\/([^/]+)(\/)?(\?.*)?$/;
 
       console.log('sortOption:', sortOption);
       console.log('sortOptionSubreddit:', sortOptionSubreddit);
       console.log('subredditSortOptions:', subredditSortOptions);
+      console.log('sortOptionUser:', sortOptionUser);
 
       // Step 1: Handle home page sorting
       if (homeUrls.includes(requestDetails.url) && !requestDetails.url.includes(`/${sortOption}`)) {
@@ -66,6 +69,19 @@ function redirect(requestDetails) {
           const targetGlobalUrl = `https://www.reddit.com/r/${subredditName}/${sortOptionSubreddit}`;
           console.log(`Redirecting ${subredditName} to global sort option:`, targetGlobalUrl);
           return { redirectUrl: targetGlobalUrl };
+        }
+      }
+
+      // Step 4: Apply global user sort option
+      if (userPattern.test(requestDetails.url)) {
+        const match = requestDetails.url.match(userPattern);
+        const userName = match[1];
+        const currentSortOption = new URL(requestDetails.url).searchParams.get("sort");
+
+        if (currentSortOption !== sortOptionUser) {
+          const targetUserUrl = `https://www.reddit.com/user/${userName}/?sort=${sortOptionUser}`;
+          console.log(`Redirecting user ${userName} to global sort option:`, targetUserUrl);
+          return { redirectUrl: targetUserUrl };
         }
       }
 
