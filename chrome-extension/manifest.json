@@ -1,19 +1,24 @@
 {
   "manifest_version": 2,
-  "name": "Default Sort for Reddit",
-  "version": "1.0",
-  "description": "Automatically set the default sort option for Reddit.",
+  "name": "defaultSortForReddit",
+  "version": "2.0",
+  "description": "This add-on will allow users to select which option they want to use when going to Reddit's home page. By default, it will sort to the \"new\" option.",
   "permissions": [
+    "storage",
     "webRequest",
     "webRequestBlocking",
-    "storage",
+    "http://www.reddit.com/*",
     "https://www.reddit.com/*"
   ],
   "background": {
-    "scripts": ["background.js"],
-    "persistent": true
+    "scripts": ["/node_modules/webextension-polyfill/dist/browser-polyfill.js", "background.js"]
   },
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "defaultSortForReddit@gmail"
+    }
+  },
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -23,7 +28,5 @@
   "icons": {
     "48": "icons/icon.png"
   },
-  "author": "Copyright 2025 defaultSortForReddit. All Rights Reserved.",
-  "homepage_url": "https://github.com/defaultSortForReddit/defaultSortForReddit",
-  "update_url": "https://github.com/defaultSortForReddit/defaultSortForReddit/releases"
+  "author": "Copyright 2025 defaultSortForReddit. All rights reserved."
 }

@@ -1,38 +1,65 @@
 // Author: James Wiesen
 // Copyright © 2025 defaultSortForReddit. All rights reserved.
-
 console.log('Background script running');
 
+let sortOptions = {
+    sortOption: "new",
+    sortOptionSubreddit: "new",
+    subredditSortOptions: {},
+    sortOptionUser: "new"
+};
+
+// Fetch sort options and store them in the global variable
+function fetchSortOptions() {
+    browser.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "sortOptionUser"])
+    .then(result => {
+        sortOptions.sortOption = result.sortOption || "new";
+        sortOptions.sortOptionSubreddit = result.sortOptionSubreddit || "new";
+        sortOptions.subredditSortOptions = result.subredditSortOptions || {};
+        sortOptions.sortOptionUser = result.sortOptionUser || "new";
+        console.log('Sort options fetched:', sortOptions);
+    })
+    .catch(error => {
+        console.error('Error fetching sort options:', error);
+    });
+}
+
+// Fetch sort options when the extension is loaded
+fetchSortOptions();
+
+// Listen for changes to the storage and update the sort options
+browser.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local') {
+        if (changes.sortOption) {
+            sortOptions.sortOption = changes.sortOption.newValue || "new";
+        }
+        if (changes.sortOptionSubreddit) {
+            sortOptions.sortOptionSubreddit = changes.sortOptionSubreddit.newValue || "new";
+        }
+        if (changes.subredditSortOptions) {
+            sortOptions.subredditSortOptions = changes.subredditSortOptions.newValue || {};
+        }
+        if (changes.sortOptionUser) {
+            sortOptions.sortOptionUser = changes.sortOptionUser.newValue || "new";
+        }
+        console.log('Sort options updated:', sortOptions);
+    }
+});
+
+browser.webRequest.onBeforeRequest.addListener(
+    redirect,
+    { urls: ["https://www.reddit.com/*"] },
+    ["blocking"]
+  );
+
+console.log('EventListener added');
+
+// Redirect to the appropriate sort option
 function redirect(requestDetails) {
-  console.log('Redirect function called');
-  console.log('Request URL:', requestDetails.url);
+    console.log('Redirect function called');
+    console.log('Request URL:', requestDetails.url);
 
-  // Do not redirect message URLs
-  if (requestDetails.url.startsWith("https://www.reddit.com/message")) {
-    console.log('No redirect for message URLs.');
-    return {};
-  }
-
-  return new Promise((resolve, reject) => {
-    chrome.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "sortOptionUser"], (result) => {
-      if (chrome.runtime.lastError) {
-        console.error('Error accessing chrome.storage:', chrome.runtime.lastError);
-        reject(chrome.runtime.lastError);
-        return;
-      }
-      
-      console.log('Storage result:', result);
-      const sortOption = result.sortOption || "new"; // Home page sort option
-      const sortOptionSubreddit = result.sortOptionSubreddit || "new"; // Global subreddit sort option
-      let subredditSortOptions = result.subredditSortOptions || {}; // Specific subreddit sort options
-      const sortOptionUser = result.sortOptionUser || "new"; // Global user sort option
-
-      // Sort subredditSortOptions by subreddit name (key)
-      subredditSortOptions = Object.fromEntries(
-        Object.entries(subredditSortOptions).sort(([a], [b]) => a.localeCompare(b))
-      );
-
-      const homeUrls = [
+    const homeUrls = [
         "https://www.reddit.com/",
         "https://www.reddit.com/?feed=home",
         "https://www.reddit.com/best/?feed=home",
@@ -40,26 +67,31 @@ function redirect(requestDetails) {
         "https://www.reddit.com/top/?feed=home",
         "https://www.reddit.com/new/?feed=home",
         "https://www.reddit.com/rising/?feed=home"
-      ];
+    ];
 
-      const subredditPattern = /https:\/\/www\.reddit\.com\/r\/([^/]+)(\/)?(\?.*)?$/;
-      const userPattern = /https:\/\/www\.reddit\.com\/user\/([^/]+)(\/)?(\?.*)?$/;
+    const subredditPattern = /https:\/\/www\.reddit\.com\/r\/([^/]+)(\/[^/?]+)?(\/)?(\?.*)?$/;
+    const userPattern = /https:\/\/www\.reddit\.com\/user\/([^/]+)(\/)?(\?.*)?$/;
 
-      console.log('sortOption:', sortOption);
-      console.log('sortOptionSubreddit:', sortOptionSubreddit);
-      console.log('subredditSortOptions:', subredditSortOptions);
-      console.log('sortOptionUser:', sortOptionUser);
+    if (!homeUrls.includes(requestDetails.url) && !subredditPattern.test(requestDetails.url) && !userPattern.test(requestDetails.url)) {
+        console.log('No redirect for non-home, non-user, and non-subreddit URLs.');
+        return {};
+    }
 
-      // Step 1: Handle home page sorting
-      if (homeUrls.includes(requestDetails.url) && !requestDetails.url.includes(`/${sortOption}`)) {
-        const homeTargetUrl = `https://www.reddit.com/${sortOption}/?feed=home`;
-        console.log('Redirecting home page to:', homeTargetUrl);
-        resolve({ redirectUrl: homeTargetUrl });
-        return;
-      }
+    const sortOption = sortOptions.sortOption;
+    const sortOptionSubreddit = sortOptions.sortOptionSubreddit;
+    const subredditSortOptions = sortOptions.subredditSortOptions;  
+    const sortOptionUser = sortOptions.sortOptionUser;
 
-      // Step 2: Apply subreddit-specific sort options where specified
-      if (subredditPattern.test(requestDetails.url)) {
+    let targetUrl = null;
+
+    // Step 1: Handle home page sorting
+    if (homeUrls.includes(requestDetails.url) && !requestDetails.url.includes(`/${sortOption}`)) {
+        targetUrl = `https://www.reddit.com/${sortOption}/?feed=home`;
+        console.log('Redirecting home page to:', targetUrl);
+    }
+
+    // Step 2: Apply subreddit-specific sort options where specified
+    if (subredditPattern.test(requestDetails.url)) {
         const match = requestDetails.url.match(subredditPattern);
         const subredditName = match[1].toLowerCase(); // Convert URL subreddit to lowercase
         const specificSortOption = subredditSortOptions[subredditName];
@@ -67,18 +99,14 @@ function redirect(requestDetails) {
 
         // Handle specific sort option
         if (specificSortOption && currentSortOption !== specificSortOption) {
-          const targetUrl = `https://www.reddit.com/r/${subredditName}/${specificSortOption}`;
+          targetUrl = `https://www.reddit.com/r/${subredditName}/${specificSortOption}`;
           console.log(`Redirecting ${subredditName} to its specific sort option:`, targetUrl);
-          resolve({ redirectUrl: targetUrl });
-          return;
         }
 
         // Step 3: Apply global subreddit sort option if no specific option exists
         if (!specificSortOption && currentSortOption !== sortOptionSubreddit) {
-          const targetGlobalUrl = `https://www.reddit.com/r/${subredditName}/${sortOptionSubreddit}`;
-          console.log(`Redirecting ${subredditName} to global sort option:`, targetGlobalUrl);
-          resolve({ redirectUrl: targetGlobalUrl });
-          return;
+          targetUrl = `https://www.reddit.com/r/${subredditName}/${sortOptionSubreddit}`;
+          console.log(`Redirecting ${subredditName} to global sort option:`, targetUrl);
         }
       }
 
@@ -89,34 +117,16 @@ function redirect(requestDetails) {
         const currentSortOption = new URL(requestDetails.url).searchParams.get("sort");
 
         if (currentSortOption !== sortOptionUser) {
-          const targetUserUrl = `https://www.reddit.com/user/${userName}/?sort=${sortOptionUser}`;
-          console.log(`Redirecting user ${userName} to global sort option:`, targetUserUrl);
-          resolve({ redirectUrl: targetUserUrl });
-          return;
+          targetUrl = `https://www.reddit.com/user/${userName}/?sort=${sortOptionUser}`;
+          console.log(`Redirecting user ${userName} to global sort option:`, targetUrl);
         }
       }
 
-      console.log('No redirect needed.');
-      resolve({});
-    });
-  });
-}
-
-chrome.webRequest.onBeforeRequest.addListener(
-  async (details) => {
-    try {
-      const result = await redirect(details);
-      if (result && result.redirectUrl) {
-        console.log('Returning redirect URL:', result.redirectUrl);
-        return { redirectUrl: result.redirectUrl };
+    if (targetUrl) {
+        console.log('Returning targetUrl:', targetUrl);
+        return { redirectUrl: targetUrl };
+      } else {
+        console.log('No redirect needed.');
+        return {};
       }
-    } catch (error) {
-      console.error('Error during redirection:', error);
-    }
-    return {};
-  },
-  { urls: ["https://www.reddit.com/*"] },
-  ["blocking"]
-);
-
-console.log('Event listener set up');
+}
