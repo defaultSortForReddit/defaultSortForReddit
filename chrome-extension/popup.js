@@ -1,7 +1,7 @@
 // Author: James Wiesen
 // Copyright © 2025 defaultSortForReddit. All rights reserved.
 
-// Save options to browser.storage
+// Save options to chrome.storage
 function saveOptions() {
   const sortOption = document.getElementById("sortOption").value;
   const sortOptionSubreddit = document.getElementById("sortOptionSubreddit").value;
@@ -12,7 +12,7 @@ function saveOptions() {
   }, {});
   const darkMode = document.getElementById("darkModeToggle").checked;
 
-  browser.storage.local.set({
+  chrome.storage.local.set({
       sortOption: sortOption,
       sortOptionSubreddit: sortOptionSubreddit,
       sortOptionUser: sortOptionUser,
@@ -29,7 +29,7 @@ function saveOptions() {
   });
 }
 
-// Restore options from browser.storage
+// Restore options from chrome.storage
 function restoreOptions() {
   function setCurrentChoice(result) {
       const sortOption = result.sortOption || "new";
@@ -59,7 +59,7 @@ function restoreOptions() {
       console.error(`Error: ${error}`);
   }
 
-  const getting = browser.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "darkMode", "sortOptionUser"]);
+  const getting = chrome.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "darkMode", "sortOptionUser"]);
   getting.then(setCurrentChoice, onError);
 }
 
@@ -84,7 +84,7 @@ function handlePreferenceChange(event) {
   if (event.target.id === "darkModeToggle") {
       const isDarkMode = event.target.checked;
       applyDarkMode(isDarkMode);
-      browser.storage.local.set({ darkMode: isDarkMode }); // Save Dark Mode preference
+      chrome.storage.local.set({ darkMode: isDarkMode }); // Save Dark Mode preference
   }
 }
 
@@ -98,8 +98,8 @@ function addSubredditPreference() {
       localStorage.setItem("subredditSortOptions", JSON.stringify(subredditSortOptions));
       updateSubredditPreferencesList(subredditSortOptions);
 
-      // Save subreddit preferences only to browser storage
-      browser.storage.local.set({ subredditSortOptions: subredditSortOptions }).then(() => {
+      // Save subreddit preferences only to chrome storage
+      chrome.storage.local.set({ subredditSortOptions: subredditSortOptions }).then(() => {
           document.getElementById("subredditName").value = "";
           document.getElementById("subredditSortOption").value = "new"; // Default to "new"
           document.getElementById("addSubredditBtn").disabled = true;
