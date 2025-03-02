@@ -72,9 +72,9 @@
             background-color: #555555; /* Slightly darker button on hover */
         }
         .dark-mode-toggle {
-            position: relative;
-            left: 335px;
-            top: 20px;
+            position: absolute; /* Change from relative to absolute */
+            right: 10px; /* Adjust positioning */
+            top: 80px; /* Adjust positioning */
             display: flex;
             align-items: center;
         }
@@ -124,11 +124,12 @@
     </style>
 </head>
 <body>
-    <h1>defaultSortForReddit Options     <label class="dark-mode-toggle">
+    <h1>defaultSortForReddit Options</h1>
+    <label class="dark-mode-toggle">
         <input type="checkbox" id="darkModeToggle" style="display:none;">
         <span class="slider"></span>
         <span class="dark-mode-label">Dark Mode</span>
-    </label> </h1>
+    </label>
     <h2>Home Page Sort Option</h2>
     <label for="sortOption">Choose your default sort option for the home page:</label>
     <select id="sortOption" default="new">
