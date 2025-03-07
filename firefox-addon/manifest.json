@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "defaultSortForReddit",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "This add-on will allow users to select default sort options on various Reddit pages",
   "permissions": [
     "storage",

@@ -37,13 +37,13 @@
             "https://www.reddit.com/rising/?feed=home"
         ];
 
-        const subredditPattern = /https:\/\/www\.reddit\.com\/r\/([^/]+)(\/[^/?]+)?(\/)?(\?.*)?$/;
+        const subredditPattern = /https:\/\/www\.reddit\.com\/r\/([^/]+)\/?(new|hot|top|rising)?\/?$/;
         const userPattern = /https:\/\/www\.reddit\.com\/user\/([^/]+)(\/)?(\?.*)?$/;
 
         if (!homeUrls.includes(url) && !subredditPattern.test(url) && !userPattern.test(url)) {
             return;
         }
-
+        
         let targetUrl = null;
 
         // Handle home page sorting

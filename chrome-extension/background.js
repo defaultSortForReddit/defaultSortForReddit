@@ -85,7 +85,7 @@ function updateDynamicRules() {
       priority: 1,
       action: { type: "redirect", redirect: { regexSubstitution: `https://www.reddit.com/r/\\1/${sortOptions.sortOptionSubreddit}/` } },
       condition: {
-        regexFilter: "^https://www\\.reddit\\.com/r/([^/]+)(/[^/?]+)?(/)?(\\?.*)?$",
+        regexFilter: `https://www\\.reddit\\.com/r/([^/]+)(/)+([^/]+)(/)$`,
         resourceTypes: ["main_frame"],
         excludedRequestDomains: [`www.reddit.com/r/\\1/${sortOptions.sortOptionSubreddit}/`]
       }
