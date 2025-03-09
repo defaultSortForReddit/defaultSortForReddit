@@ -67,16 +67,19 @@ function updateDynamicRules() {
 
     // Subreddit rules
     Object.keys(sortOptions.subredditSortOptions).forEach((subredditName, index) => {
-      rules.push({
-        id: index + 4,
-        priority: 1,
-        action: { type: "redirect", redirect: { regexSubstitution: `https://www.reddit.com/r/${subredditName}/${sortOptions.subredditSortOptions[subredditName]}/` } },
-        condition: {
-          regexFilter: `^https://www\\.reddit\\.com/r/${subredditName}(/[^/?]+)?(/)?(\\?.*)?$`,
-          resourceTypes: ["main_frame"],
-          excludedRequestDomains: [`www.reddit.com/r/${subredditName}/${sortOptions.subredditSortOptions[subredditName]}/`]
+        const sortOption = sortOptions.subredditSortOptions[subredditName];
+        if (sortOption) {
+            rules.push({
+                id: index + 4,
+                priority: 1,
+                action: { type: "redirect", redirect: { regexSubstitution: `https://www.reddit.com/r/${subredditName}/${sortOption}/` } },
+                condition: {
+                    regexFilter: `^https://www\\.reddit\\.com/r/${subredditName}(/[^/?]+)?(/)?(\\?.*)?$`,
+                    resourceTypes: ["main_frame"],
+                    excludedRequestDomains: [`www.reddit.com/r/${subredditName}/${sortOption}/`]
+                }
+            });
         }
-      });
     });
 
     // Global subreddit rule
@@ -103,9 +106,9 @@ function updateDynamicRules() {
         }
     });
 
-    // Update dynamic rules
+    // Remove all existing rules and add the new rules
     chrome.declarativeNetRequest.updateDynamicRules({
-        removeRuleIds: rules.map(rule => rule.id),
+        removeRuleIds: [], // Empty array to remove all existing rules
         addRules: rules
     }).then(() => {
         console.log('Dynamic rules updated:', rules);
