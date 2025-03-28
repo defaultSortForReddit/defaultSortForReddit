@@ -1,5 +1,5 @@
 # defaultSortForReddit
-Simple firefox extension to automatically sort home and subreddit lists. 
+Simple firefox and chrome extension to automatically sort home, subreddit, and user pages.  
 
 This add-on will allow Reddit users to select which option they want to use to sort content when going to the home page, or individual subreddits. By default, it will sort to the "new" option. Designed to work with reddit.com, not old reddit.
 
@@ -11,16 +11,16 @@ It's free and allows you to set your preferred sort method for both the home pag
 
 Main Screen: 
 
-![Alt text](images/MainScreen.png?raw=true "MainScreen")
+![Alt text](firefox-addon/images/MainScreen.png?raw=true "MainScreen")
 
 Main Screen (Dark Mode): 
 
-![Alt text](images/MainScreenDarkMode.png?raw=true "MainScreenDarkMode")
+![Alt text](firefox-addon/images/MainScreenDarkMode.png?raw=true "MainScreenDarkMode")
 
 
 Minimal Permissions Required:
 
-![Alt text](images/Permissions.png?raw=true "Permissions")
+![Alt text](firefox-addon/images/Permissions.png?raw=true "Permissions")
 
 **Author**
 
