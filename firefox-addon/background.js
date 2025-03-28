@@ -13,12 +13,13 @@ function redirect(requestDetails) {
     return {};
   }
 
-  return browser.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "sortOptionUser"])
+  return browser.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "sortOptionUser", "sortOptionComments"])
     .then(result => {
       const sortOption = result.sortOption || "new"; // Home page sort option
       const sortOptionSubreddit = result.sortOptionSubreddit || "new"; // Global subreddit sort option
       let subredditSortOptions = result.subredditSortOptions || {}; // Specific subreddit sort options
       const sortOptionUser = result.sortOptionUser || "new"; // Global user sort option
+      const sortOptionComments = result.sortOptionComments || "best"; // Global comment sort option
 
       // Sort subredditSortOptions by subreddit name (key)
       subredditSortOptions = Object.fromEntries(
@@ -37,11 +38,13 @@ function redirect(requestDetails) {
 
       const subredditPattern = /https:\/\/www\.reddit\.com\/r\/([^/]+)(\/)?(\?.*)?$/;
       const userPattern = /https:\/\/www\.reddit\.com\/user\/([^/]+)(\/)?(\?.*)?$/;
+      const commentsPattern = /https:\/\/www\.reddit\.com\/r\/([^/]+)\/comments\/([^/]+)\/([^/]+)\/(\?.*)?$/;
 
       console.log('sortOption:', sortOption);
       console.log('sortOptionSubreddit:', sortOptionSubreddit);
       console.log('subredditSortOptions:', subredditSortOptions);
       console.log('sortOptionUser:', sortOptionUser);
+      console.log('sortOptionComments:', sortOptionComments);
 
       // Step 1: Handle home page sorting
       if (homeUrls.includes(requestDetails.url) && !requestDetails.url.includes(`/${sortOption}`)) {
@@ -82,6 +85,21 @@ function redirect(requestDetails) {
           const targetUserUrl = `https://www.reddit.com/user/${userName}/?sort=${sortOptionUser}`;
           console.log(`Redirecting user ${userName} to global sort option:`, targetUserUrl);
           return { redirectUrl: targetUserUrl };
+        }
+      }
+
+      // Step 5: Apply global comment sort option
+      if (commentsPattern.test(requestDetails.url)) {
+        const match = requestDetails.url.match(commentsPattern);
+        const subredditName = match[1];
+        const postId = match[2];
+        const postTitle = match[3];
+        const currentSortOption = new URL(requestDetails.url).searchParams.get("sort");
+
+        if (currentSortOption !== sortOptionComments) {
+          const targetCommentsUrl = `https://www.reddit.com/r/${subredditName}/comments/${postId}/${postTitle}/?sort=${sortOptionComments}`;
+          console.log(`Redirecting comments on post ${postId} to global sort option:`, targetCommentsUrl);
+          return { redirectUrl: targetCommentsUrl };
         }
       }
 
