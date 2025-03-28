@@ -6,7 +6,7 @@ function saveOptions() {
   const sortOption = document.getElementById("sortOption").value;
   const sortOptionSubreddit = document.getElementById("sortOptionSubreddit").value;
   const sortOptionUser = document.getElementById("sortOptionUser").value;
-  const sortOptionComments = document.getElementById("sortOptionComments").value; // Added
+  const sortOptionComments = document.getElementById("sortOptionComments").value; 
   const subredditSortOptions = Object.keys(JSON.parse(localStorage.getItem("subredditSortOptions")) || {}).sort().reduce((acc, key) => {
       acc[key] = JSON.parse(localStorage.getItem("subredditSortOptions"))[key];
       return acc;
@@ -17,7 +17,7 @@ function saveOptions() {
       sortOption: sortOption,
       sortOptionSubreddit: sortOptionSubreddit,
       sortOptionUser: sortOptionUser,
-      sortOptionComments: sortOptionComments, // Added
+      sortOptionComments: sortOptionComments, 
       subredditSortOptions: subredditSortOptions,
       darkMode: darkMode
   }).then(() => {
@@ -37,14 +37,14 @@ function restoreOptions() {
       const sortOption = result.sortOption || "new";
       const sortOptionSubreddit = result.sortOptionSubreddit || "new";
       const sortOptionUser = result.sortOptionUser || "new";
-      const sortOptionComments = result.sortOptionComments || "best"; // Added
+      const sortOptionComments = result.sortOptionComments || "best"; 
       const subredditSortOptions = result.subredditSortOptions || {};
       const darkMode = result.darkMode || false;
 
       document.getElementById("sortOption").value = sortOption;
       document.getElementById("sortOptionSubreddit").value = sortOptionSubreddit;
       document.getElementById("sortOptionUser").value = sortOptionUser;
-      document.getElementById("sortOptionComments").value = sortOptionComments; // Added
+      document.getElementById("sortOptionComments").value = sortOptionComments; 
       
       const sortedSubredditSortOptions = Object.keys(subredditSortOptions).sort().reduce((acc, key) => {
           acc[key] = subredditSortOptions[key];
@@ -63,7 +63,7 @@ function restoreOptions() {
       console.error(`Error: ${error}`);
   }
 
-  const getting = browser.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "darkMode", "sortOptionUser", "sortOptionComments"]); // Added
+  const getting = browser.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "darkMode", "sortOptionUser", "sortOptionComments"]); 
   getting.then(setCurrentChoice, onError);
 }
 
@@ -189,7 +189,7 @@ document.getElementById("saveBtn").addEventListener("click", saveOptions);
 document.getElementById("sortOption").addEventListener("change", handlePreferenceChange);
 document.getElementById("sortOptionSubreddit").addEventListener("change", handlePreferenceChange);
 document.getElementById("sortOptionUser").addEventListener("change", handlePreferenceChange);
-document.getElementById("sortOptionComments").addEventListener("change", handlePreferenceChange); // Added
+document.getElementById("sortOptionComments").addEventListener("change", handlePreferenceChange); 
 document.getElementById("addSubredditBtn").addEventListener("click", addSubredditPreference);
 document.getElementById("subredditName").addEventListener("input", checkAddSubredditPreference);
 document.getElementById("subredditSortOption").addEventListener("change", checkAddSubredditPreference);

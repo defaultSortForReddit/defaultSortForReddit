@@ -6,21 +6,29 @@
         sortOption: "new",
         sortOptionSubreddit: "new",
         subredditSortOptions: {},
-        sortOptionUser: "new"
+        sortOptionUser: "new",
+        sortOptionComments: "best" 
     };
 
     // Fetch sort options from storage
     function fetchSortOptions() {
-        return chrome.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "sortOptionUser"])
-            .then(result => {
-                sortOptions.sortOption = result.sortOption || "new";
-                sortOptions.sortOptionSubreddit = result.sortOptionSubreddit || "new";
-                sortOptions.subredditSortOptions = result.subredditSortOptions || {};
-                sortOptions.sortOptionUser = result.sortOptionUser || "new";
-            })
-            .catch(error => {
-                console.error('Error fetching sort options:', error);
-            });
+        return chrome.storage.local.get([
+            "sortOption", 
+            "sortOptionSubreddit", 
+            "subredditSortOptions", 
+            "sortOptionUser",
+            "sortOptionComments" 
+        ])
+        .then(result => {
+            sortOptions.sortOption = result.sortOption || "new";
+            sortOptions.sortOptionSubreddit = result.sortOptionSubreddit || "new";
+            sortOptions.subredditSortOptions = result.subredditSortOptions || {};
+            sortOptions.sortOptionUser = result.sortOptionUser || "new";
+            sortOptions.sortOptionComments = result.sortOptionComments || "best"; 
+        })
+        .catch(error => {
+            console.error('Error fetching sort options:', error);
+        });
     }
 
     // Redirect based on sort options
@@ -39,8 +47,9 @@
 
         const subredditPattern = /https:\/\/www\.reddit\.com\/r\/([^/]+)\/?(new|hot|top|rising)?\/?$/;
         const userPattern = /https:\/\/www\.reddit\.com\/user\/([^/]+)(\/)?(\?.*)?$/;
+        const commentsPattern = /https:\/\/www\.reddit\.com\/r\/([^/]+)\/comments\/([^/]+)\/([^/]+)(\/)?(\?.*)?$/; 
 
-        if (!homeUrls.includes(url) && !subredditPattern.test(url) && !userPattern.test(url)) {
+        if (!homeUrls.includes(url) && !subredditPattern.test(url) && !userPattern.test(url) && !commentsPattern.test(url)) { 
             return;
         }
         
@@ -79,6 +88,20 @@
                 targetUrl = `https://www.reddit.com/user/${userName}/?sort=${sortOptions.sortOptionUser}`;
             }
         }
+
+        // Apply global comment sort option
+        if (commentsPattern.test(url)) { 
+            const match = url.match(commentsPattern); 
+            const subredditName = match[1]; 
+            const postId = match[2]; 
+            const postTitle = match[3]; 
+            const currentSortOption = new URL(url).searchParams.get("sort"); 
+
+            if (currentSortOption !== sortOptions.sortOptionComments) { 
+                const targetCommentsUrl = `https://www.reddit.com/r/${subredditName}/comments/${postId}/${postTitle}/?sort=${sortOptions.sortOptionComments}`; 
+                window.location.replace(targetCommentsUrl); 
+            } 
+        } 
 
         if (targetUrl && targetUrl !== url) {
             window.location.replace(targetUrl);

@@ -7,17 +7,19 @@ let sortOptions = {
     sortOption: "new",
     sortOptionSubreddit: "new",
     subredditSortOptions: {},
-    sortOptionUser: "new"
+    sortOptionUser: "new",
+    sortOptionComments: "best" 
 };
 
 // Fetch sort options and store them in the global variable
 function fetchSortOptions() {
-    return chrome.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "sortOptionUser"])
+    return chrome.storage.local.get(["sortOption", "sortOptionSubreddit", "subredditSortOptions", "sortOptionUser", "sortOptionComments"]) 
     .then(result => {
         sortOptions.sortOption = result.sortOption || "new";
         sortOptions.sortOptionSubreddit = result.sortOptionSubreddit || "new";
         sortOptions.subredditSortOptions = result.subredditSortOptions || {};
         sortOptions.sortOptionUser = result.sortOptionUser || "new";
+        sortOptions.sortOptionComments = result.sortOptionComments || "best"; 
         console.log('Sort options fetched:', sortOptions);
     })
     .catch(error => {
@@ -31,7 +33,7 @@ function updateDynamicRules() {
 
     // Home page rule
     rules.push({
-        id: 1,
+        id: 101,
         priority: 1,
         action: { type: "redirect", redirect: { regexSubstitution: `https://www.reddit.com/${sortOptions.sortOption}/?feed=home` } },
         condition: {
@@ -43,7 +45,7 @@ function updateDynamicRules() {
 
     // Home page rule with sort option in URL
     rules.push({
-        id: 2,
+        id: 102,
         priority: 1,
         action: { type: "redirect", redirect: { regexSubstitution: `https://www.reddit.com/${sortOptions.sortOption}/?feed=home` } },
         condition: {
@@ -55,7 +57,7 @@ function updateDynamicRules() {
 
     // Home page rule with feed parameter
     rules.push({
-        id: 3,
+        id: 103,
         priority: 1,
         action: { type: "redirect", redirect: { regexSubstitution: `https://www.reddit.com/${sortOptions.sortOption}/?feed=home` } },
         condition: {
@@ -70,7 +72,7 @@ function updateDynamicRules() {
         const sortOption = sortOptions.subredditSortOptions[subredditName];
         if (sortOption) {
             rules.push({
-                id: index + 4,
+                id: index + 200,
                 priority: 1,
                 action: { type: "redirect", redirect: { regexSubstitution: `https://www.reddit.com/r/${subredditName}/${sortOption}/` } },
                 condition: {
@@ -106,15 +108,33 @@ function updateDynamicRules() {
         }
     });
 
-    // Remove all existing rules and add the new rules
-    chrome.declarativeNetRequest.updateDynamicRules({
-        removeRuleIds: [], // Empty array to remove all existing rules
-        addRules: rules
-    }).then(() => {
-        console.log('Dynamic rules updated:', rules);
-    }).catch(error => {
-        console.error('Error updating dynamic rules:', error);
+    // Comments rule
+    rules.push({
+        id: 1002,
+        priority: 1,
+        action: { type: "redirect", redirect: { regexSubstitution: `https://www.reddit.com/r/\\1/comments/\\2/\\3/?sort=${sortOptions.sortOptionComments}` } },
+        condition: {
+            regexFilter: "^https://www\\.reddit\\.com/r/([^/]+)/comments/([^/]+)/([^/]+)(/)?(\\?.*)?$",
+            resourceTypes: ["main_frame"],
+            excludedRequestDomains: [`www.reddit.com/r/\\1/comments/\\2/\\3/?sort=${sortOptions.sortOptionComments}`]
+        }
     });
+
+    // Remove all existing rules and add the new rules
+    chrome.declarativeNetRequest.getDynamicRules()
+        .then(existingRules => {
+            const existingRuleIds = existingRules.map(rule => rule.id);
+            return chrome.declarativeNetRequest.updateDynamicRules({
+                removeRuleIds: existingRuleIds, // Remove all existing rules
+                addRules: rules
+            });
+        })
+        .then(() => {
+            console.log('Dynamic rules updated:', rules);
+        })
+        .catch(error => {
+            console.error('Error updating dynamic rules:', error);
+        });
 }
 
 // Fetch sort options when the extension is loaded
@@ -134,6 +154,9 @@ chrome.storage.onChanged.addListener((changes, area) => {
         }
         if (changes.sortOptionUser) {
             sortOptions.sortOptionUser = changes.sortOptionUser.newValue || "new";
+        }
+        if (changes.sortOptionComments) {
+            sortOptions.sortOptionComments = changes.sortOptionComments.newValue || "best";
         }
         console.log('Sort options updated:', sortOptions);
         updateDynamicRules();
